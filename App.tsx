@@ -1,131 +1,73 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import type {PropsWithChildren} from 'react';
+import type {ReactNode} from 'react';
 import {
-  ScrollView,
-  StatusBar,
+  SafeAreaView,
   StyleSheet,
-  Text,
-  useColorScheme,
   View,
 } from 'react-native';
+import './shim.js';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+// @ts-ignore
+import SmartHomeSDK from '@rentlydev/smarthome-sdk';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const getPropertyLevelTokenApi = async ({propertyId, clientId, clientSecret, setAccessToken} :any) => {
+  const url = `https://smarthome.qe.rentlycore.com/api/properties/${propertyId}/token`;
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const params = {
+    client_id: clientId,
+    client_secret: clientSecret,
   };
 
-  /*
-   * To keep the template simple and small we're adding padding to prevent view
-   * from rendering under the System UI.
-   * For bigger apps the recommendation is to use `react-native-safe-area-context`:
-   * https://github.com/AppAndFlow/react-native-safe-area-context
-   *
-   * You can read more about it here:
-   * https://github.com/react-native-community/discussions-and-proposals/discussions/827
-   */
-  const safePadding = '5%';
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
 
-  return (
-    <View style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        style={backgroundStyle}>
-        <View style={{paddingRight: safePadding}}>
-          <Header/>
-        </View>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            paddingHorizontal: safePadding,
-            paddingBottom: safePadding,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </View>
-  );
+    if (!response.ok) {
+      throw new Error();
+    }
+
+    const accessTokenData = await response.json();
+    return Promise.resolve(accessTokenData);
+
+  } catch (error : any) {
+
+    if(error){
+      console.log("Error in fetching property token", error);   
+      return Promise.reject(error); 
+    }
+
+  }
 }
 
+
+const App: () => ReactNode = () => {
+  
+  const clientId = "ekhp0b6oJqoh_-h-Z2LC6iYktRKaNP-Zw01EnQLBrms";
+  const clientSecret = "12oJR9VJ82HKDPJ9fG5IsvPz3hmVl8jog6yOes6Lwsc";
+  const propertyId = 227971;
+
+  const getAccessToken = async () =>{
+   return await getPropertyLevelTokenApi( { clientId, clientSecret, propertyId } );            
+  };
+
+  return (
+    <SafeAreaView style={{flex:1}}>
+      <View style={{flex:1, backgroundColor: "#F3FAFF" }} >
+       <SmartHomeSDK 
+          getAccessToken = {getAccessToken}
+          propertyId  = { propertyId }
+        /> 
+      </View>
+    </SafeAreaView>
+  );
+};
+
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
 });
 
 export default App;
