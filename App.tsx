@@ -11,7 +11,7 @@ import './shim.js';
 import SmartHomeSDK from '@rentlydev/smarthome-sdk';
 
 const getPropertyLevelTokenApi = async ({propertyId, clientId, clientSecret, setAccessToken} :any) => {
-  const url = `https://smarthome.qe.rentlycore.com/api/properties/${propertyId}/token`;
+  const url = `https://app2.keyless.rocks/api/properties/${propertyId}/token`;
 
   const params = {
     client_id: clientId,
@@ -47,9 +47,9 @@ const getPropertyLevelTokenApi = async ({propertyId, clientId, clientSecret, set
 
 const App: () => ReactNode = () => {
   
-  const clientId = "ekhp0b6oJqoh_-h-Z2LC6iYktRKaNP-Zw01EnQLBrms";
-  const clientSecret = "12oJR9VJ82HKDPJ9fG5IsvPz3hmVl8jog6yOes6Lwsc";
-  const propertyId = 227971;
+  const clientId = "xYu8CZHJRHxCiTmz6gsVCo-FnzKPg5EcE89eWwxjzMc";
+  const clientSecret = "OO7I1CyQI1N9DLNpkrKQGgYBofpXLZaeDi5r79LbXLk";
+  const propertyId = 223439;
 
   const getAccessToken = async () =>{
    return await getPropertyLevelTokenApi( { clientId, clientSecret, propertyId } );            
